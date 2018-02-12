@@ -12,11 +12,10 @@ class SetCommand: Command {
     let scaleOption = scale.value ?? nil
     let screens = NSScreen.screens
 
-    // updating all screens by default
+    // Updating all screens by default
     for screen in screens {
       setDesktopImage(screen: screen, imgPath: path.value, scale: scaleOption)
     }
-
   }
 }
 

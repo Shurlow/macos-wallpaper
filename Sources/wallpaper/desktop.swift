@@ -1,4 +1,5 @@
 import AppKit
+import SQLite
 
 func setDesktopImage(screen: NSScreen, imgPath: String, scale: String?, color: NSColor? = nil) {
 
@@ -44,6 +45,27 @@ func getDesktopImage() -> String {
   let workspace = NSWorkspace.shared
   let screen = NSScreen.main
   let path = workspace.desktopImageURL(for: screen!)!.path
+  var isDir: ObjCBool = false
+
+  FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+
+  if isDir.boolValue {
+    let dirs = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
+    let dbPath = NSString.path(withComponents: [dirs[0], "Dock/desktoppicture.db"])
+
+    do {
+      let db = try Connection(dbPath)
+      let column = Expression<String>("value")
+      let data = Table("data").select(column)
+      let lastRow = Array(try db.prepare(data)).last
+      let img = try lastRow!.get(column)
+      let imgPath = NSString.path(withComponents: [path, img])
+      return imgPath
+    } catch {
+      print(error)
+    }
+  }
+
   return path
 }
 
