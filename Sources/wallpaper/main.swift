@@ -12,7 +12,7 @@ class SetCommand: Command {
     let scaleOption = scale.value ?? nil
     let screens = NSScreen.screens
 
-    // Updating all screens by default
+    // Update all screens by default
     for screen in screens {
       setDesktopImage(screen: screen, imgPath: path.value, scale: scaleOption)
     }
@@ -26,6 +26,14 @@ class GetCommand: Command {
     print(getDesktopImage())
   }
 }
+
+// class CleanCommand: Command {
+//   let name = "clean"
+//   let shortDescription = "Clean desktoppicture.db Useful after subsequent writes with matching filenames."
+//   func execute() throws {
+//     cleanDesktopDB()
+//   }
+// }
 
 // --- Initialize CLI ---
 let myCLI = CLI(name: "wallpaper", version: "1.4.0", description: "Get or set the desktop wallpaper on macOS")
