@@ -1,18 +1,12 @@
 import AppKit
 import SQLite
 
-func setDesktopImage(screen: NSScreen, imgPath: String, scale: String?, color: NSColor? = nil) {
+func setDesktopImage(screen: NSScreen, imgPath: String, scale: String?) {
 
   let imgurl = NSURL.fileURL(withPath: imgPath)
   let workspace = NSWorkspace.shared
 
   var options: [NSWorkspace.DesktopImageOptionKey: Any] = [:]
-
-  if color == nil {
-    options[NSWorkspace.DesktopImageOptionKey.fillColor] = randomColor()
-  } else {
-    options[NSWorkspace.DesktopImageOptionKey.fillColor] = color
-  }
 
   if scale == "fill" {
     options[NSWorkspace.DesktopImageOptionKey.imageScaling] = 3 // enum case scaleProportionallyUpOrDown = 3
@@ -37,7 +31,7 @@ func setDesktopImage(screen: NSScreen, imgPath: String, scale: String?, color: N
   do {
     try workspace.setDesktopImageURL(imgurl, for: screen, options: options)
   } catch {
-    print(error)
+    print("Error setting wallpaper:", error)
   }
 }
 
@@ -54,30 +48,20 @@ func getDesktopImage() -> String {
     let dbPath = NSString.path(withComponents: [dirs[0], "Dock/desktoppicture.db"])
 
     do {
-      let db = try Connection(dbPath)
+      let table = Table("data")
       let column = Expression<String>("value")
-      let data = Table("data").select(column)
-      let lastRow = Array(try db.prepare(data)).last
-      let img = try lastRow!.get(column)
-      let imgPath = NSString.path(withComponents: [path, img])
-      return imgPath
+      let rowid = Expression<Int64>("rowid")
+
+      let db = try Connection(dbPath)
+      let maxID = try db.scalar(table.select(rowid.max))
+      let query = table.select(column).filter(rowid == maxID!) // SELECT * FROM data WHERE rowid=(SELECT max(rowid) FROM data);
+      let img = try db.pluck(query)!.get(column)
+
+      return NSString.path(withComponents: [path, img])
     } catch {
-      print(error)
+      print("Error retrieving image:", error)
     }
   }
 
   return path
-}
-
-func randomFloat() -> CGFloat {
-  return CGFloat(arc4random()) / CGFloat(UInt32.max)
-}
-
-func randomColor() -> NSColor {
-  return NSColor(
-    red: randomFloat(),
-    green: randomFloat(),
-    blue: randomFloat(),
-    alpha: 1
-  )
 }
