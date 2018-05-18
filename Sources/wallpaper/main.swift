@@ -4,7 +4,7 @@ import SwiftCLI
 
 class SetCommand: Command {
   let name = "set"
-  let shortDescription = "Set wallpaper image. Usage set <path>"
+  let shortDescription = "Set wallpaper image. Usage: set <path> [-s <scale>]"
   let path = Parameter()
   let scale = Key<String>("-s", "--scale", description: "Image scale options [fill, fit, stretch, center]")
 

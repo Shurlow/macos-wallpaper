@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "wallpaper",
     dependencies: [
-      .package(url: "https://github.com/jakeheis/SwiftCLI", from: "4.0.0"),
+      .package(url: "https://github.com/jakeheis/SwiftCLI", from: "5.0.0"),
       .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.11.4")
     ],
     targets: [
